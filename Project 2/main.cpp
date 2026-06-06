@@ -31,14 +31,14 @@ AppStatus gAppStatus     = RUNNING;
 GameMode  gGameMode      = TWO_PLAYER;
 float     gPreviousTicks = 0.0f;
 
-Entity *gPaddles = nullptr;  // [0] = Messi (left), [1] = Cristiano (right)
-Entity *gBalls   = nullptr;  // up to MAX_BALLS
+Entity *gPaddles = nullptr;  
+Entity *gBalls   = nullptr;  
 
 int   gActiveBalls  = 1;
 int   gMessiScore   = 0;
 int   gRonaldoScore = 0;
 bool  gGameOver     = false;
-float gAIDirection  = 1.0f;  // 1.0 = down, -1.0 = up
+float gAIDirection  = 1.0f;  
 
 // Function Declarations
 void initialise();
@@ -53,7 +53,7 @@ void initialise()
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Messi vs Cristiano");
 
     gPaddles = new Entity[2] {
-        Entity({ PADDLE_WIDTH,                ORIGIN.y }, { PADDLE_WIDTH, PADDLE_HEIGHT }, MESSI_FP),
+        Entity({ PADDLE_WIDTH,ORIGIN.y }, { PADDLE_WIDTH, PADDLE_HEIGHT }, MESSI_FP),
         Entity({ SCREEN_WIDTH - PADDLE_WIDTH, ORIGIN.y }, { PADDLE_WIDTH, PADDLE_HEIGHT }, CRISTIANO_FP)
     };
 
@@ -79,52 +79,42 @@ void processInput()
 
     if (gGameOver) return;
 
-    // Toggle single / two-player mode
-    if (IsKeyPressed(KEY_T))
-        gGameMode = (gGameMode == TWO_PLAYER) ? ONE_PLAYER : TWO_PLAYER;
+    if (IsKeyPressed(KEY_T)) gGameMode = (gGameMode == TWO_PLAYER) ? ONE_PLAYER : TWO_PLAYER;
 
-    // Number of active balls
-    if      (IsKeyPressed(KEY_ONE))   gActiveBalls = 1;
-    else if (IsKeyPressed(KEY_TWO))   gActiveBalls = 2;
+
+    if (IsKeyPressed(KEY_ONE)) gActiveBalls = 1;
+    else if (IsKeyPressed(KEY_TWO)) gActiveBalls = 2;
     else if (IsKeyPressed(KEY_THREE)) gActiveBalls = 3;
 
     for (int i = 0; i < MAX_BALLS; i++)
-    {
-        if (i < gActiveBalls) gBalls[i].activate();
-        else                  gBalls[i].deactivate();
-    }
+    { if (i < gActiveBalls) gBalls[i].activate();
+      else gBalls[i].deactivate(); }
 
-    // Messi (left) — always player-controlled
+    
     gPaddles[0].setVelocity({ 0.0f, 0.0f });
-    if      (IsKeyDown(KEY_W)) gPaddles[0].setVelocity({ 0.0f, -PADDLE_SPEED });
-    else if (IsKeyDown(KEY_S)) gPaddles[0].setVelocity({ 0.0f,  PADDLE_SPEED });
+    if (IsKeyDown(KEY_W)) gPaddles[0].setVelocity({ 0.0f, -PADDLE_SPEED });
+    else if (IsKeyDown(KEY_S)) gPaddles[0].setVelocity({ 0.0f, PADDLE_SPEED });
 
-    // Cristiano (right) — player-controlled only in two-player mode
+
     if (gGameMode == TWO_PLAYER)
-    {
-        gPaddles[1].setVelocity({ 0.0f, 0.0f });
-        if      (IsKeyDown(KEY_UP))   gPaddles[1].setVelocity({ 0.0f, -PADDLE_SPEED });
-        else if (IsKeyDown(KEY_DOWN)) gPaddles[1].setVelocity({ 0.0f,  PADDLE_SPEED });
-    }
+    { gPaddles[1].setVelocity({ 0.0f, 0.0f });
+      if (IsKeyDown(KEY_UP)) gPaddles[1].setVelocity({ 0.0f, -PADDLE_SPEED });
+      else if (IsKeyDown(KEY_DOWN)) gPaddles[1].setVelocity({ 0.0f, PADDLE_SPEED });}
 }
 
 void update()
 {
-    float ticks     = (float) GetTime();
+    float ticks = (float) GetTime();
     float deltaTime = ticks - gPreviousTicks;
     gPreviousTicks  = ticks;
 
     if (gGameOver) return;
 
-    // AI movement for Cristiano in single-player mode
     if (gGameMode == ONE_PLAYER)
-    {
-        gPaddles[1].setVelocity({ 0.0f, gAIDirection * AI_SPEED });
-
-        float cristianoY = gPaddles[1].getPosition().y;
-        if      (cristianoY <= PADDLE_HEIGHT / 2.0f)                  gAIDirection =  1.0f;
-        else if (cristianoY >= SCREEN_HEIGHT - PADDLE_HEIGHT / 2.0f)  gAIDirection = -1.0f;
-    }
+    { gPaddles[1].setVelocity({ 0.0f, gAIDirection * AI_SPEED });
+      float cristianoY = gPaddles[1].getPosition().y;
+      if(cristianoY <= PADDLE_HEIGHT / 2.0f) gAIDirection =  1.0f;
+      else if (cristianoY >= SCREEN_HEIGHT - PADDLE_HEIGHT / 2.0f)  gAIDirection = -1.0f;}
 
     gPaddles[0].update(deltaTime, nullptr, 0);
     gPaddles[1].update(deltaTime, nullptr, 0);
@@ -133,22 +123,17 @@ void update()
     gPaddles[1].clampToScreen(SCREEN_HEIGHT);
 
     for (int i = 0; i < MAX_BALLS; i++)
-    {
-        gBalls[i].update(deltaTime, gPaddles, 2);
-        gBalls[i].bounceOffWalls(SCREEN_HEIGHT);
-
-        Vector2 pos = gBalls[i].getPosition();
-
-        if (pos.x < -BALL_SIZE)
-        {
-            if (gRonaldoScore < RONALDO_MAX_SCORE) gRonaldoScore++;
+    {gBalls[i].update(deltaTime, gPaddles, 2);
+     gBalls[i].bounceOffWalls(SCREEN_HEIGHT);
+     Vector2 pos = gBalls[i].getPosition();
+     if (pos.x < -BALL_SIZE){
+        if (gRonaldoScore < MESSI_WIN_SCORE) gRonaldoScore++;
             gBalls[i].setPosition(ORIGIN);
-            gBalls[i].setVelocity({ BALL_SPEED, BALL_SPEED * 0.6f });
-        }
-        else if (pos.x > SCREEN_WIDTH + BALL_SIZE)
-        {
-            gMessiScore++;
-            if (gMessiScore >= MESSI_WIN_SCORE) gGameOver = true;
+            gBalls[i].setVelocity({ BALL_SPEED, BALL_SPEED * 0.6f });}
+       
+     else if (pos.x > SCREEN_WIDTH + BALL_SIZE){
+        gMessiScore++;
+        if (gMessiScore >= MESSI_WIN_SCORE) gGameOver = true;
             gBalls[i].setPosition(ORIGIN);
             gBalls[i].setVelocity({ -BALL_SPEED, BALL_SPEED * 0.6f });
         }
@@ -164,13 +149,16 @@ void render()
     gPaddles[1].render();
 
     for (int i = 0; i < MAX_BALLS; i++) gBalls[i].render();
-
-    // Score display
-    DrawText(TextFormat("Messi: %d",   gMessiScore),   20,                 20, 30, WHITE);
-    DrawText(TextFormat("Ronaldo: %d", gRonaldoScore), SCREEN_WIDTH - 200, 20, 30, WHITE);
-
-    if (gRonaldoScore >= RONALDO_MAX_SCORE)
-        DrawText("CAP", SCREEN_WIDTH - 155, 55, 25, YELLOW);
+    if (gRonaldoScore <= RONALDO_MAX_SCORE) {
+        DrawText(TextFormat("Messi: %d", gMessiScore), 20, 20, 30, WHITE);
+        DrawText(TextFormat("Ronaldo: %d", gRonaldoScore), SCREEN_WIDTH - 220, 20, 30, WHITE);
+    }
+    else {
+        DrawText(TextFormat("Messi: %d", gMessiScore), 20, 20, 30, WHITE);
+        DrawText("Ronaldo: ", SCREEN_WIDTH - 220, 20, 30, WHITE);
+        DrawText("CAP", SCREEN_WIDTH - 220 + 130, 20, 30, RED);
+    }
+   
 
     if (gGameMode == ONE_PLAYER)
         DrawText("1-Player Mode", SCREEN_WIDTH / 2 - 85, 20, 25, YELLOW);
