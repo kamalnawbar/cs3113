@@ -1,3 +1,13 @@
+/**
+* Author: [Kamal Nawbar]
+* Assignment: Pong Clone
+* Date due: [06/06/2026]
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #include "CS3113/Entity.h"
 
 // Global Constants
