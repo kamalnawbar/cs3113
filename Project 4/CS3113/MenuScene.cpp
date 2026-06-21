@@ -25,7 +25,7 @@ void MenuScene::render()
 {
     ClearBackground(ColorFromHex(mBGColourHexCode));
 
-    // titre
+
     DrawText(
         "Rise of the AI",
         (int) mOrigin.x - 200,
@@ -34,7 +34,7 @@ void MenuScene::render()
         WHITE
     );
 
-    // instructions
+
     DrawText(
         "Press ENTER to start",
         (int) mOrigin.x - 130,
@@ -44,7 +44,4 @@ void MenuScene::render()
     );
 }
 
-void MenuScene::shutdown()
-{
-    // rien a delete — pas de map, pas de joueur
-}
+void MenuScene::shutdown() {}

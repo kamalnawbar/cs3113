@@ -66,27 +66,11 @@ void Level2::initialise()
     mGameState.player->setSpeed(280);
 
     /*
-        ----------- ENNEMIS (8 au total) -----------
-        Disposition:
-          Section 1 (cols 0-3)   : Spike [0] col 3.5
-          Gap 1 (cols 4-6)       : pierre col 5
-          Section 2 (cols 7-11)  : Saw [3] PATROL 7-11 + plateforme row4 cols 8-10
-          Gap 2 (cols 12-13)     : pierre col 12
-          Section 3 (cols 14-17) : Spike [1] col 15.5
-          Gap 3 (cols 18-20)     : pierres cols 19-20
-          Section 4 (cols 21-22) : Saw [4] PATROL 21-25 (section etroite + gap 4)
-          Gap 4 (cols 23-25)     : pierre col 24
-          Section 5 (cols 26-30) : Spike [2] col 26.5 + Saw [5] PATROL 26-30
-                                   + plateforme row4 cols 27-29 + SpikeHead [6] col 29
-          Gap 5 (cols 31-33)     : pierres cols 31-32
-          Section 6 (cols 34-37) : (respiration apres section 5)
-          Gap 6 (cols 38-39)     : pierre col 38
-          Section 7 (cols 40-45) : SpikeHead [7] col 43 + plateforme row4 cols 41-43
+        ----------- ENNEMIes 8
     */
     mGameState.enemyCount = LEVEL_2_ENEMY_COUNT;
     mGameState.enemies    = new Entity[LEVEL_2_ENEMY_COUNT];
 
-    // --- [0] Spike — col 3.5, juste avant le 1er gap ---
     mGameState.enemies[0].setPosition({
         leftBoundary + 3.5f * TILE_DIMENSION,
         topBoundary  + 6.0f * TILE_DIMENSION - TILE_DIMENSION * 0.2f
@@ -95,7 +79,6 @@ void Level2::initialise()
     mGameState.enemies[0].setColliderDimensions({ TILE_DIMENSION * 0.8f, TILE_DIMENSION * 0.35f });
     mGameState.enemies[0].setTexture("assets/Traps/Spikes/Idle.png");
 
-    // --- [1] Spike — col 15.5, piege discret apres gap 2 ---
     mGameState.enemies[1].setPosition({
         leftBoundary + 15.5f * TILE_DIMENSION,
         topBoundary  +  6.0f * TILE_DIMENSION - TILE_DIMENSION * 0.2f
@@ -104,7 +87,6 @@ void Level2::initialise()
     mGameState.enemies[1].setColliderDimensions({ TILE_DIMENSION * 0.8f, TILE_DIMENSION * 0.35f });
     mGameState.enemies[1].setTexture("assets/Traps/Spikes/Idle.png");
 
-    // --- [2] Spike — col 26.5, entree de la section 5 (danger double) ---
     mGameState.enemies[2].setPosition({
         leftBoundary + 26.5f * TILE_DIMENSION,
         topBoundary  +  6.0f * TILE_DIMENSION - TILE_DIMENSION * 0.2f
@@ -113,8 +95,7 @@ void Level2::initialise()
     mGameState.enemies[2].setColliderDimensions({ TILE_DIMENSION * 0.8f, TILE_DIMENSION * 0.35f });
     mGameState.enemies[2].setTexture("assets/Traps/Spikes/Idle.png");
 
-    // --- [3] Saw — flottante PATROL cols 7-11, section 2 ---
-    // La plateforme a row4 cols 8-10 permet de passer au-dessus
+
     mGameState.enemies[3].setPosition({
         leftBoundary +  9.0f * TILE_DIMENSION,
         topBoundary  +  5.0f * TILE_DIMENSION
@@ -135,11 +116,9 @@ void Level2::initialise()
         leftBoundary + 11.0f * TILE_DIMENSION
     );
     mGameState.enemies[3].setSpeed(140);
-    // PAS de setAcceleration → gravite zero → flotte
     mGameState.enemies[3].setFrameSpeed(12);
 
-    // --- [4] Saw — flottante PATROL cols 21-25, section etroite + gap 4 ---
-    // Force un timing precis : la section 4 n'a que 2 tuiles de large
+  
     mGameState.enemies[4].setPosition({
         leftBoundary + 22.0f * TILE_DIMENSION,
         topBoundary  +  5.0f * TILE_DIMENSION
@@ -162,9 +141,7 @@ void Level2::initialise()
     mGameState.enemies[4].setSpeed(165);
     mGameState.enemies[4].setFrameSpeed(12);
 
-    // --- [5] Saw — flottante PATROL cols 26-30, section 5 (danger double) ---
-    // Combine avec le spike [2] et le spike head [6] → section la plus difficile
-    // La plateforme row4 cols 27-29 permet d'eviter la saw par le dessus
+
     mGameState.enemies[5].setPosition({
         leftBoundary + 28.0f * TILE_DIMENSION,
         topBoundary  +  5.0f * TILE_DIMENSION
@@ -187,12 +164,10 @@ void Level2::initialise()
     mGameState.enemies[5].setSpeed(155);
     mGameState.enemies[5].setFrameSpeed(12);
 
-    // --- [6] Spike Head — FOLLOWER col 29.5, section 5 ---
-    // Combine avec la saw [5] → gauntlet central du niveau
-    // Strategie : monter sur la plateforme row4 cols 27-29, puis sprinter vers gap 5
+
     mGameState.enemies[6].setPosition({
         leftBoundary + 29.5f * TILE_DIMENSION,
-        topBoundary  +  1.0f * TILE_DIMENSION   // spawne en hauteur, tombe sur le sol
+        topBoundary  +  1.0f * TILE_DIMENSION   
     });
     mGameState.enemies[6].setScale({ TILE_DIMENSION, TILE_DIMENSION });
     mGameState.enemies[6].setColliderDimensions({ TILE_DIMENSION * 0.75f, TILE_DIMENSION * 0.75f });
@@ -210,12 +185,11 @@ void Level2::initialise()
     mGameState.enemies[6].setAcceleration({ 0.0f, ACCELERATION_OF_GRAVITY });
     mGameState.enemies[6].setFrameSpeed(8);
 
-    // --- [7] Spike Head — FOLLOWER col 43, gauntlet final (section 7) ---
-    // La plateforme row4 cols 41-43 offre une echappatoire par le dessus
-    // Sprinter jusqu'au bord droit pour terminer le niveau
+   
+    // Sprint till edge to win lvl
     mGameState.enemies[7].setPosition({
         leftBoundary + 43.0f * TILE_DIMENSION,
-        topBoundary  +  1.0f * TILE_DIMENSION   // spawne en hauteur, tombe sur le sol
+        topBoundary  +  1.0f * TILE_DIMENSION   
     });
     mGameState.enemies[7].setScale({ TILE_DIMENSION, TILE_DIMENSION });
     mGameState.enemies[7].setColliderDimensions({ TILE_DIMENSION * 0.75f, TILE_DIMENSION * 0.75f });
@@ -233,7 +207,6 @@ void Level2::initialise()
     mGameState.enemies[7].setAcceleration({ 0.0f, ACCELERATION_OF_GRAVITY });
     mGameState.enemies[7].setFrameSpeed(8);
 
-    // memorise les positions initiales pour le reset au respawn
     for (int i = 0; i < LEVEL_2_ENEMY_COUNT; i++)
         mEnemyStartPositions[i] = mGameState.enemies[i].getPosition();
 }
@@ -303,7 +276,7 @@ void Level2::updatePlayerAnimation()
 void Level2::checkEnemyCollisions()
 {
     if (mHitCooldown > 0.0f) return;
-    if (mGameState.nextSceneID != NO_SCENE) return; // evite le double-declenchement
+    if (mGameState.nextSceneID != NO_SCENE) return; 
 
     for (int i = 0; i < mGameState.enemyCount; i++)
     {
@@ -315,7 +288,6 @@ void Level2::checkEnemyCollisions()
             mGameState.lives--;
             mHitCooldown = HIT_COOLDOWN_DURATION;
 
-            // respawn au niveau 2 (les ennemis et le joueur se remettent a zero)
             if (mGameState.lives <= 0)
                 mGameState.nextSceneID = GAME_OVER_SCREEN;
             else
@@ -350,13 +322,11 @@ void Level2::update(float deltaTime)
     updatePlayerAnimation();
     checkEnemyCollisions();
 
-    // fin du niveau : joueur atteint le bord droit → ecran de victoire
     float rightBoundary = mOrigin.x + (LEVEL_2_WIDTH * TILE_DIMENSION) / 2.0f;
     if (mGameState.nextSceneID == NO_SCENE &&
         mGameState.player->getPosition().x > rightBoundary - TILE_DIMENSION)
         mGameState.nextSceneID = LEVEL_3;
 
-    // tombe dans un trou
     float bottomBoundary = mOrigin.y + (LEVEL_2_HEIGHT * TILE_DIMENSION) / 2.0f;
     if (mGameState.nextSceneID == NO_SCENE &&
         mGameState.player->getPosition().y > bottomBoundary)
@@ -397,7 +367,6 @@ void Level2::shutdown()
     mGameState.bgm = {};
     UnloadSound(mGameState.jumpSound);
     mGameState.jumpSound = {};
-    // attendre que le son de mort finisse avant de liberer le buffer
     while (IsSoundPlaying(mGameState.hitSound)) {}
     UnloadSound(mGameState.hitSound);
     mGameState.hitSound = {};
